@@ -1,0 +1,28 @@
+service: berylitics 
+
+frameworkVersion: '3'
+
+custom:
+  wsgi:
+    app: api.app
+
+provider:
+  name: aws
+  runtime: python3.10
+  region: eu-west-1
+
+functions:
+  api:
+    handler: wsgi_handler.handler
+    memorySize: 128
+    timeout: 20
+    events:
+      - httpApi: '*'
+    cors:
+      origin: '*'
+      headers:
+        - Content-Type
+
+plugins:
+  - serverless-wsgi
+  - serverless-python-requirements
