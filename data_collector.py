@@ -35,7 +35,7 @@ def get_aggregated_stations():
         obj = s3.Object(BUCKET, 'stations.json')
         data = json.loads(obj.get()['Body'].read().decode('utf-8'))
         return data
-    except:
+    except Exception:
         return []
 
 
@@ -149,7 +149,6 @@ def main(ctx, evt):
 
         write_aggregated_stations(local_stations)
 
-
         logging.info("Updating counts for each station...")
         station_status = get_station_status()
         station_statuses = station_status['data']['stations']
@@ -167,9 +166,8 @@ def main(ctx, evt):
                 }
                 logging.info("Writing station %s" % station_id)
                 write_station_data(station_id, data)
-            except Exception as err:
+            except Exception:
                 logging.error("Error updating station %s" % station_id)
-
 
         logging.info("Counting available bikes...")
         bikes = get_available_bikes()
