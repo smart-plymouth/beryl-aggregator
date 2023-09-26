@@ -1,0 +1,36 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+     - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Update Packages
+        run: |
+          sudo apt-get update -y
+          sudo apt-get upgrade -y
+      - name: Install Serverless
+        run: |
+          sudo curl -o- -L https://slss.io/install | bash
+      - name: Setup AWS Credentials
+        run: |
+          mkdir ~/.aws
+          touch ~/.aws/credentials
+          echo "[default]" >> ~/.aws/credentials
+          echo "aws_access_key_id = ${{ secrets.AWS_ACCESS_KEY }}" >> ~/.aws/credentials
+          echo "aws_secret_access_key = ${{ secrets.AWS_SECRET_KEY }}" >> ~/.aws/credentials
+      - name: Install Serverless Dependencies
+        run: |
+          npm install
+      - name: Run Serverless Deploy
+        run: |
+          export PATH="$HOME/.serverless/bin:$PATH"
+          serverless deploy
